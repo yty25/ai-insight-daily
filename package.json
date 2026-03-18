@@ -1,0 +1,25 @@
+{
+  "name": "ai-insight-daily-v2",
+  "version": "2.0.0",
+  "description": "AI Insight Daily - 每日 AI 资讯精选",
+  "main": "server.js",
+  "scripts": {
+    "start": "python3 server.py",
+    "fetch": "python3 fetch_news.py",
+    "summarize": "python3 summarize.py",
+    "dev": "python3 server.py"
+  },
+  "keywords": [
+    "ai",
+    "news",
+    "llm",
+    "technology",
+    "daily"
+  ],
+  "author": "AI Insight Daily",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-insight-daily/ai-insight-daily-v2.git"
+  }
+}

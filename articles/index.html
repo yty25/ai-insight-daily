@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章详情 - AI Insight Daily</title>
+  <meta name="description" content="AI Insight Daily 文章详情">
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="文章详情 - AI Insight Daily">
+  <meta property="og:description" content="阅读完整文章">
+  <meta property="og:type" content="article">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  
+  <link rel="stylesheet" href="../style.css">
+  
+  <style>
+    .article-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .action-btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .action-btn-primary:hover {
+      background: #0052CC;
+    }
+    
+    .action-btn-secondary {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .action-btn-secondary:hover {
+      border-color: var(--primary-color);
+    }
+    
+    .article-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    
+    .article-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .article-error h2 {
+      color: var(--accent-red);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="/" class="logo">🤖 AI Insight Daily</a>
+      <div class="nav-links">
+        <a href="/#llm" class="nav-link">🧠 大模型</a>
+        <a href="/#ai_industry" class="nav-link">💼 AI 产业</a>
+        <a href="/#politics" class="nav-link">🌍 国际政治</a>
+        <a href="/#finance" class="nav-link">📈 金融</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 文章容器 -->
+  <main class="article-container">
+    <!-- 加载状态 -->
+    <div id="loading" class="article-loading">
+      <div class="loading-spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-secondary)">加载文章中...</p>
+    </div>
+
+    <!-- 错误状态 -->
+    <div id="error" style="display: none;" class="article-error">
+      <h2>⚠️ 文章未找到</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        抱歉，您访问的文章不存在或已被删除。
+      </p>
+      <a href="/" class="action-btn action-btn-primary">返回首页</a>
+    </div>
+
+    <!-- 文章内容 -->
+    <article id="article-content" style="display: none;">
+      <a href="/" class="back-button">
+        ← 返回首页
+      </a>
+
+      <header class="article-header">
+        <span id="article-category" class="article-category category-llm">大模型动态</span>
+        <h1 id="article-title" class="article-title"></h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-item">
+            <span>📰</span>
+            <span id="article-source"></span>
+          </div>
+          <div class="article-meta-item">
+            <span>👤</span>
+            <span id="article-author"></span>
+          </div>
+          <div class="article-meta-item">
+            <span>📅</span>
+            <span id="article-date"></span>
+          </div>
+        </div>
+      </header>
+
+      <img id="article-image" src="" alt="" class="article-image" style="display: none;">
+
+      <div class="article-summary">
+        <div class="article-summary-title">📝 AI 摘要</div>
+        <div id="article-summary" class="article-summary-content"></div>
+      </div>
+
+      <div id="article-body" class="article-content">
+        <!-- 文章正文 -->
+      </div>
+
+      <div class="article-actions">
+        <a id="article-original-link" href="#" target="_blank" class="action-btn action-btn-primary">
+          🔗 阅读原文
+        </a>
+        <a href="/" class="action-btn action-btn-secondary">
+          📰 更多资讯
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-copyright">
+        © 2025 AI Insight Daily. All rights reserved.
+      </div>
+      <div class="footer-links">
+        <a href="/feed.xml" class="footer-link">📰 RSS Feed</a>
+        <a href="/sitemap.xml" class="footer-link">🗺️ Sitemap</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 获取 URL 参数
+    function getUrlParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // 格式化日期
+    function formatDate(dateStr) {
+      if (!dateStr) return '未知日期';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('zh-CN', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    // 格式化文章内容
+    function formatContent(content) {
+      if (!content) return '<p>暂无内容</p>';
+      
+      // 将段落分割并包装
+      const paragraphs = content.split(/\n\n+/);
+      return paragraphs
+        .filter(p => p.trim().length > 0)
+        .map(p => `<p>${p.trim()}</p>`)
+        .join('');
+    }
+
+    // 加载文章
+    async function loadArticle() {
+      const url = getUrlParam('url');
+      
+      if (!url) {
+        showError();
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/article?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        
+        if (data.error || !data.article) {
+          showError();
+          return;
+        }
+        
+        const article = data.article;
+        
+        // 设置标题
+        document.title = `${article.title} - AI Insight Daily`;
+        
+        // 更新 OpenGraph
+        document.querySelector('meta[property="og:title"]').setAttribute('content', article.title);
+        document.querySelector('meta[property="og:description"]').setAttribute('content', article.summary || '');
+        
+        // 填充内容
+        document.getElementById('article-title').textContent = article.title;
+        document.getElementById('article-category').textContent = article.category_name || article.category;
+        document.getElementById('article-category').className = `article-category category-${article.category}`;
+        document.getElementById('article-source').textContent = article.source;
+        document.getElementById('article-author').textContent = article.author || '佚名';
+        document.getElementById('article-date').textContent = formatDate(article.publish_date);
+        document.getElementById('article-summary').textContent = article.summary || '暂无摘要';
+        document.getElementById('article-body').innerHTML = formatContent(article.clean_content);
+        
+        // 设置图片
+        const imageEl = document.getElementById('article-image');
+        if (article.cover_image) {
+          imageEl.src = article.cover_image;
+          imageEl.style.display = 'block';
+          imageEl.onerror = function() {
+            this.style.display = 'none';
+          };
+        }
+        
+        // 设置原文链接
+        const originalLink = document.getElementById('article-original-link');
+        originalLink.href = article.original_url;
+        
+        // 显示文章
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('article-content').style.display = 'block';
+        
+      } catch (error) {
+        console.error('加载文章失败:', error);
+        showError();
+      }
+    }
+
+    // 显示错误
+    function showError() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+    }
+
+    // 页面加载
+    document.addEventListener('DOMContentLoaded', loadArticle);
+  </script>
+</body>
+</html>

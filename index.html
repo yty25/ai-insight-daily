@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Insight Daily - 每日 AI 资讯精选</title>
+  <meta name="description" content="每日精选 AI 行业资讯，涵盖大模型动态、AI 产业、国际政治与金融">
+  <meta name="keywords" content="AI, 人工智能，大模型，LLM, OpenAI, 科技资讯">
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="AI Insight Daily - 每日 AI 资讯精选">
+  <meta property="og:description" content="每日精选 AI 行业资讯，涵盖大模型动态、AI 产业、国际政治与金融">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ai-insight-daily.com">
+  <meta property="og:image" content="/images/og-image.jpg">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Insight Daily">
+  <meta name="twitter:description" content="每日精选 AI 行业资讯">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- RSS Feed -->
+  <link rel="alternate" type="application/rss+xml" title="AI Insight Daily RSS" href="/feed.xml">
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="/" class="logo">🤖 AI Insight Daily</a>
+      <div class="nav-links">
+        <a href="#llm" class="nav-link" data-category="llm">🧠 大模型</a>
+        <a href="#ai_industry" class="nav-link" data-category="ai_industry">💼 AI 产业</a>
+        <a href="#politics" class="nav-link" data-category="politics">🌍 国际政治</a>
+        <a href="#finance" class="nav-link" data-category="finance">📈 金融</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主容器 -->
+  <main class="container">
+    <!-- 加载状态 -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div id="content" style="display: none;">
+      <!-- 热门榜单 -->
+      <section class="trending-section">
+        <div class="trending-header">
+          🔥 今日热门 TOP 10
+        </div>
+        <div id="trending-list" class="trending-list">
+          <!-- 动态生成 -->
+        </div>
+      </section>
+
+      <!-- 四大板块 -->
+      <section id="llm-section">
+        <div class="section-header">
+          <span class="section-icon">🧠</span>
+          <h2 class="section-title">大模型动态</h2>
+          <span class="section-count" id="llm-count">0</span>
+        </div>
+        <div id="llm-grid" class="news-grid">
+          <!-- 动态生成 -->
+        </div>
+      </section>
+
+      <section id="ai_industry-section">
+        <div class="section-header">
+          <span class="section-icon">💼</span>
+          <h2 class="section-title">AI 行业资讯</h2>
+          <span class="section-count" id="ai_industry-count">0</span>
+        </div>
+        <div id="ai_industry-grid" class="news-grid">
+          <!-- 动态生成 -->
+        </div>
+      </section>
+
+      <section id="politics-section">
+        <div class="section-header">
+          <span class="section-icon">🌍</span>
+          <h2 class="section-title">国际政治</h2>
+          <span class="section-count" id="politics-count">0</span>
+        </div>
+        <div id="politics-grid" class="news-grid">
+          <!-- 动态生成 -->
+        </div>
+      </section>
+
+      <section id="finance-section">
+        <div class="section-header">
+          <span class="section-icon">📈</span>
+          <h2 class="section-title">金融</h2>
+          <span class="section-count" id="finance-count">0</span>
+        </div>
+        <div id="finance-grid" class="news-grid">
+          <!-- 动态生成 -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-copyright">
+        © 2025 AI Insight Daily. All rights reserved.
+      </div>
+      <div class="footer-links">
+        <a href="/feed.xml" class="footer-link">📰 RSS Feed</a>
+        <a href="/sitemap.xml" class="footer-link">🗺️ Sitemap</a>
+        <a href="https://github.com" class="footer-link">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 格式化日期
+    function formatDate(dateStr) {
+      if (!dateStr) return '未知日期';
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = now - date;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      
+      if (days === 0) return '今日';
+      if (days === 1) return '昨日';
+      if (days < 7) return `${days}天前`;
+      
+      return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    }
+
+    // 创建新闻卡片
+    function createNewsCard(news) {
+      const card = document.createElement('a');
+      card.className = 'news-card';
+      card.href = `/articles/?url=${encodeURIComponent(news.original_url)}`;
+      
+      const imageHtml = news.cover_image 
+        ? `<img src="${news.cover_image}" alt="${news.title}" class="news-card-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 200%22><rect fill=%22%2327272A%22 width=%22400%22 height=%22200%22/><text fill=%22%23A1A1AA%22 x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>No Image</text></svg>'">`
+        : `<div class="news-card-image" style="background: linear-gradient(135deg, #27272A, #3F3F46);"></div>`;
+      
+      card.innerHTML = `
+        ${imageHtml}
+        <div class="news-card-content">
+          <span class="news-card-category category-${news.category}">${news.category_name || news.category}</span>
+          <h3 class="news-card-title">${news.title}</h3>
+          <p class="news-card-summary">${news.summary || '暂无摘要'}</p>
+          <div class="news-card-meta">
+            <div class="news-card-source">
+              <span>📰 ${news.source}</span>
+            </div>
+            <span class="news-card-date">${formatDate(news.publish_date)}</span>
+          </div>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // 创建热门项
+    function createTrendingItem(news, index) {
+      const item = document.createElement('a');
+      item.className = 'trending-item';
+      item.href = `/articles/?url=${encodeURIComponent(news.original_url)}`;
+      
+      item.innerHTML = `
+        <div class="trending-rank">${index + 1}</div>
+        <div class="trending-content">
+          <div class="trending-title">${news.title}</div>
+          <div class="trending-meta">${news.source} · ${formatDate(news.publish_date)}</div>
+        </div>
+      `;
+      
+      return item;
+    }
+
+    // 加载新闻数据
+    async function loadNews() {
+      try {
+        const response = await fetch('/api/news');
+        const data = await response.json();
+        
+        const newsList = data.news || [];
+        
+        // 按分类分组
+        const categories = {
+          llm: [],
+          ai_industry: [],
+          politics: [],
+          finance: []
+        };
+        
+        newsList.forEach(news => {
+          if (categories[news.category]) {
+            categories[news.category].push(news);
+          }
+        });
+        
+        // 渲染各板块
+        Object.keys(categories).forEach(catKey => {
+          const grid = document.getElementById(`${catKey}-grid`);
+          const count = document.getElementById(`${catKey}-count`);
+          
+          if (grid && count) {
+            count.textContent = categories[catKey].length;
+            grid.innerHTML = '';
+            
+            categories[catKey].slice(0, 10).forEach(news => {
+              grid.appendChild(createNewsCard(news));
+            });
+          }
+        });
+        
+        // 渲染热门榜单（按时间排序的前 10 条）
+        const trendingList = document.getElementById('trending-list');
+        trendingList.innerHTML = '';
+        newsList.slice(0, 10).forEach((news, index) => {
+          trendingList.appendChild(createTrendingItem(news, index));
+        });
+        
+        // 显示内容，隐藏加载
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        
+      } catch (error) {
+        console.error('加载新闻失败:', error);
+        document.getElementById('loading').innerHTML = '<p style="color: var(--text-secondary)">加载失败，请刷新页面</p>';
+      }
+    }
+
+    // 平滑滚动
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const category = this.dataset.category;
+        const section = document.getElementById(`${category}-section`);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // 页面加载
+    document.addEventListener('DOMContentLoaded', loadNews);
+  </script>
+</body>
+</html>
